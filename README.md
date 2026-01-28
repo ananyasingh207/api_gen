@@ -28,34 +28,7 @@ It enables developers and product teams to describe APIs in plain language and r
 
 ---
 
-User
- ↓
-React (Monaco Editor + Swagger UI + Diff Viewer)
- ↓
-Node.js + Express (Orchestrator / API Gateway)
- ↓
-────────────────────────────────────────────
-Python Microservices (STRICTLY AI & Analysis)
-────────────────────────────────────────────
- ↓
-[ ML Processing Engine ]
- ↓
-[ LLM Spec Generator ]
- ↓
-[ OpenAPI Validator ]
- ↓
-[ Static Analysis Engine ]
- ↓
-[ Security Risk Analyzer ]
- ↓
-[ Mock Server Generator ]
- ↓
-[ CI/CD Exporter ]
- ↓
-Docker / Kubernetes (later)
-
-
-<!-- ## High-Level Architecture
+## High-Level Architecture
 
 User  
 ↓  
@@ -67,7 +40,7 @@ Python AI & Analysis Services
 ↓  
 OpenAPI Specifications & Reports  
 ↓  
-Mock Servers / CI/CD / Deployment Targets   -->
+Mock Servers / CI/CD / Deployment Targets  
 
 ---
 
