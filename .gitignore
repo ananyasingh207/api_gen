@@ -1,0 +1,42 @@
+# ===============================
+# Root-level ignores
+# ===============================
+.env
+.env.*
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs
+*.log
+logs/
+
+# ===============================
+# Frontend (React)
+# ===============================
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+
+# Frontend env files
+frontend/.env
+frontend/.env.*
+
+# ===============================
+# Backend (Node.js / Express)
+# ===============================
+backend/node_modules/
+backend/dist/
+
+# Backend env files
+backend/.env
+backend/.env.*
+
+# ===============================
+# Misc
+# ===============================
+coverage/
+.nyc_output/
