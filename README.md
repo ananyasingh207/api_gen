@@ -22,18 +22,17 @@ AI API Architect addresses this by acting as an **AI-powered backend architect**
 
 ## High-Level Architecture
 
-User
-↓
-Web Interface (React)
-↓
-Node.js + Express Backend
-↓
-Python AI & Analysis Services
-↓
-OpenAPI Specs + Reports
-↓
-Mock Servers / CI-CD / Deployment Targets
-
+User  
+↓  
+Web Interface (React)  
+↓  
+Node.js + Express Backend  
+↓  
+Python AI & Analysis Services  
+↓  
+OpenAPI Specs + Reports  
+↓  
+Mock Servers / CI/CD / Deployment Targets
 
 ---
 
@@ -93,7 +92,6 @@ Designed to be **modular and extensible**.
 ## Repository Structure
 
 ai-api-architect/
-│
 ├── frontend/ # React UI
 ├── backend/ # Node.js + Express backend
 ├── ml-services/ # Python AI & analysis microservices
