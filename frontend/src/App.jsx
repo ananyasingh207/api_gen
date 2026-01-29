@@ -5,14 +5,14 @@ function App() {
   const [spec, setSpec] = useState(null);
 
   const generateSpec = async () => {
-    const res = await fetch("http://localhost:8000/generate-spec", {
+    const res = await fetch("http://localhost:5000/generate-spec", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ requirement })
     });
 
     const data = await res.json();
-    setSpec(data);
+    setSpec(data.openapi);
   };
 
   return (
