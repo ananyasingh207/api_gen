@@ -3,6 +3,7 @@ import { useState } from "react";
 function App() {
   const [requirement, setRequirement] = useState("");
   const [spec, setSpec] = useState(null);
+  const [validation, setValidation] = useState(null);
 
   const generateSpec = async () => {
     const res = await fetch("http://localhost:5000/generate-spec", {
@@ -12,7 +13,9 @@ function App() {
     });
 
     const data = await res.json();
+    console.log(data);
     setSpec(data.openapi);
+    setValidation(data.validation);
   };
 
   return (
@@ -33,6 +36,20 @@ function App() {
       <pre>
         {spec && JSON.stringify(spec, null, 2)}
       </pre>
+
+      {validation && (
+      <div style={{ marginTop: "10px" }}>
+        {validation.valid ? (
+          <span style={{ color: "green" }}>✅ OpenAPI is valid</span>
+        ) : (
+          <div style={{ color: "red" }}>
+            ❌ Invalid OpenAPI
+            <pre>{JSON.stringify(validation.errors, null, 2)}</pre>
+          </div>
+        )}
+      </div>
+    )}
+
     </div>
   );
 }
