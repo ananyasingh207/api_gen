@@ -1,2 +1,6 @@
-fastapi
-uvicorn
+fastapi 
+uvicorn 
+pydantic 
+pyyaml 
+openapi-spec-validator 
+google-genai
