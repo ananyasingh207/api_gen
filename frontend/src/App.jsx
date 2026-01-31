@@ -5,8 +5,11 @@ function App() {
   const [spec, setSpec] = useState(null);
   const [validation, setValidation] = useState(null);
 
+  const BACKEND_URL =
+  import.meta.env.VITE_BACKEND_URL ?? "http://localhost:5000";
+
   const generateSpec = async () => {
-    const res = await fetch("http://localhost:5000/generate-spec", {
+    const res = await fetch(`${BACKEND_URL}/generate-spec`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ requirement })
