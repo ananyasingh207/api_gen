@@ -4,4 +4,4 @@ pydantic
 pyyaml 
 openapi-spec-validator 
 google-genai
-
+certifi

@@ -2,17 +2,25 @@ const express = require("express");
 const axios = require("axios");
 const router = express.Router();
 
+const SPEC_GENERATOR_URL =
+  process.env.SPEC_GENERATOR_URL || "http://localhost:8000";
+
+const OPENAPI_VALIDATOR_URL =
+  process.env.OPENAPI_VALIDATOR_URL || "http://localhost:8001";
+
 router.post("/", async (req, res) => {
   try {
-    // Phase 1: generate spec
+    const requirement = req.body.requirement;
+
+    // Phase 1
     const genRes = await axios.post(
-      "http://localhost:8000/generate",
-      { requirement: req.body.requirement }
+      `${SPEC_GENERATOR_URL}/generate`,
+      { requirement }
     );
 
-    // Phase 2: validate spec
+    // Phase 2
     const valRes = await axios.post(
-      "http://localhost:8001/validate",
+      `${OPENAPI_VALIDATOR_URL}/validate`,
       { openapi: genRes.data.openapi }
     );
 
@@ -23,8 +31,10 @@ router.post("/", async (req, res) => {
 
   } catch (err) {
     console.error(err.message);
-    res.status(500).json({ error: "Spec generation or validation failed" });
+    res.status(500).json({ error: "Spec processing failed" });
   }
 });
 
 module.exports = router;
+
+

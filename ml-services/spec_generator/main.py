@@ -1,14 +1,20 @@
 import os
+import certifi
 import yaml
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google import genai
+import traceback
+
+# -----------------------------
+# SSL FIX
+# -----------------------------
+os.environ["SSL_CERT_FILE"] = certifi.where()
 
 # -----------------------------
 # Config
 # -----------------------------
 GEMINI_API_KEY = os.getenv("API_ARCHITECT_GEMINI_KEY")
-
 if not GEMINI_API_KEY:
     raise RuntimeError("API_ARCHITECT_GEMINI_KEY not set")
 
@@ -75,6 +81,7 @@ def generate_spec(req: SpecRequest):
         return {"openapi": spec_dict}
 
     except Exception as e:
+        traceback.print_exc() 
         raise HTTPException(
             status_code=500,
             detail=f"Spec generation failed: {str(e)}"

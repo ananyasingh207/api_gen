@@ -9,4 +9,8 @@ app.use(express.json());
 
 app.use("/generate-spec", generateSpecRoute);
 
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 module.exports = app;
