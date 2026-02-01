@@ -27,6 +27,7 @@ router.post("/", async (req, res) => {
       { openapi: genRes.data.openapi }
     );
 
+    // Phase 3
     const ambRes = await axios.post(
       `${AMBIGUITY_ANALYZER_URL}/analyze`,
       { requirement }
