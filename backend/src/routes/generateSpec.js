@@ -8,6 +8,9 @@ const SPEC_GENERATOR_URL =
 const OPENAPI_VALIDATOR_URL =
   process.env.OPENAPI_VALIDATOR_URL || "http://localhost:8001";
 
+const AMBIGUITY_ANALYZER_URL =
+  process.env.AMBIGUITY_ANALYZER_URL || "http://localhost:8002";
+
 router.post("/", async (req, res) => {
   try {
     const requirement = req.body.requirement;
@@ -24,9 +27,15 @@ router.post("/", async (req, res) => {
       { openapi: genRes.data.openapi }
     );
 
+    const ambRes = await axios.post(
+      `${AMBIGUITY_ANALYZER_URL}/analyze`,
+      { requirement }
+    );
+
     res.json({
       openapi: genRes.data.openapi,
-      validation: valRes.data
+      validation: valRes.data,
+      ambiguity: ambRes.data
     });
 
   } catch (err) {
