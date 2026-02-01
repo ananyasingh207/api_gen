@@ -14,6 +14,7 @@ const AMBIGUITY_ANALYZER_URL =
 router.post("/", async (req, res) => {
   try {
     const { requirement } = req.body;
+    console.log("SPEC_GENERATOR_URL =", SPEC_GENERATOR_URL);
 
     // -------------------------
     // Phase 1 — MUST succeed
