@@ -4,6 +4,8 @@ function App() {
   const [requirement, setRequirement] = useState("");
   const [spec, setSpec] = useState(null);
   const [validation, setValidation] = useState(null);
+  const [data, setData] = useState(null);
+
 
   const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ?? "http://localhost:5000";
@@ -15,10 +17,12 @@ function App() {
       body: JSON.stringify({ requirement })
     });
 
-    const data = await res.json();
-    console.log(data);
-    setSpec(data.openapi);
-    setValidation(data.validation);
+    const responseData = await res.json();
+    console.log(responseData);
+
+    setSpec(responseData.openapi);
+    setValidation(responseData.validation);
+    setData(responseData);
   };
 
   return (
@@ -50,6 +54,24 @@ function App() {
             <pre>{JSON.stringify(validation.errors, null, 2)}</pre>
           </div>
         )}
+      </div>
+    )}
+
+    {data?.ambiguity && (
+      <div style={{ marginTop: "20px" }}>
+        <h3>⚠️ Ambiguities</h3>
+        <ul>
+          {data.ambiguity.ambiguities.map((a, i) => (
+            <li key={i}>{a}</li>
+          ))}
+        </ul>
+
+        <h3>❓ Clarification Questions</h3>
+        <ul>
+          {data.ambiguity.clarification_questions.map((q, i) => (
+            <li key={i}>{q}</li>
+          ))}
+        </ul>
       </div>
     )}
 
