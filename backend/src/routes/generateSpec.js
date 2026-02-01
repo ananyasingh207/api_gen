@@ -13,38 +13,68 @@ const AMBIGUITY_ANALYZER_URL =
 
 router.post("/", async (req, res) => {
   try {
-    const requirement = req.body.requirement;
+    const { requirement } = req.body;
 
-    // Phase 1
+    // -------------------------
+    // Phase 1 — MUST succeed
+    // -------------------------
     const genRes = await axios.post(
       `${SPEC_GENERATOR_URL}/generate`,
       { requirement }
     );
 
-    // Phase 2
-    const valRes = await axios.post(
-      `${OPENAPI_VALIDATOR_URL}/validate`,
-      { openapi: genRes.data.openapi }
-    );
+    const openapi = genRes.data.openapi;
 
-    // Phase 3
-    const ambRes = await axios.post(
-      `${AMBIGUITY_ANALYZER_URL}/analyze`,
-      { requirement }
-    );
+    // -------------------------
+    // Phase 2 — NON‑BLOCKING
+    // -------------------------
+    let validation = null;
+    try {
+      const valRes = await axios.post(
+        `${OPENAPI_VALIDATOR_URL}/validate`,
+        { openapi }
+      );
+      validation = valRes.data;
+    } catch (e) {
+      console.warn("Validator failed, continuing");
+      validation = {
+        valid: false,
+        errors: ["Validation service failed or spec is invalid"]
+      };
+    }
 
+    // -------------------------
+    // Phase 3 — NON‑BLOCKING
+    // -------------------------
+    let ambiguity = null;
+    try {
+      const ambRes = await axios.post(
+        `${AMBIGUITY_ANALYZER_URL}/analyze`,
+        { requirement }
+      );
+      ambiguity = ambRes.data;
+    } catch (e) {
+      console.warn("Ambiguity analyzer failed, continuing");
+      ambiguity = {
+        ambiguities: [],
+        clarification_questions: []
+      };
+    }
+
+    // -------------------------
+    // Final response
+    // -------------------------
     res.json({
-      openapi: genRes.data.openapi,
-      validation: valRes.data,
-      ambiguity: ambRes.data
+      openapi,
+      validation,
+      ambiguity
     });
 
   } catch (err) {
-    console.error(err.message);
-    res.status(500).json({ error: "Spec processing failed" });
+    // ONLY Phase 1 errors should land here
+    console.error("Spec generation failed:", err.message);
+    res.status(500).json({ error: "Spec generation failed" });
   }
 });
 
 module.exports = router;
-
-
