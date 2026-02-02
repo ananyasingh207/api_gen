@@ -11,6 +11,9 @@ const OPENAPI_VALIDATOR_URL =
 const AMBIGUITY_ANALYZER_URL =
   process.env.AMBIGUITY_ANALYZER_URL || "http://localhost:8002";
 
+const SECURITY_ANALYZER_URL =
+  process.env.SECURITY_ANALYZER_URL || "http://localhost:8003";
+
 router.post("/", async (req, res) => {
   try {
     const { requirement } = req.body;
@@ -29,7 +32,7 @@ router.post("/", async (req, res) => {
     // -------------------------
     // Phase 2 — NON‑BLOCKING
     // -------------------------
-    let validation = null;
+    let validation;
     try {
       const valRes = await axios.post(
         `${OPENAPI_VALIDATOR_URL}/validate`,
@@ -47,7 +50,7 @@ router.post("/", async (req, res) => {
     // -------------------------
     // Phase 3 — NON‑BLOCKING
     // -------------------------
-    let ambiguity = null;
+    let ambiguity;
     try {
       const ambRes = await axios.post(
         `${AMBIGUITY_ANALYZER_URL}/analyze`,
@@ -63,16 +66,32 @@ router.post("/", async (req, res) => {
     }
 
     // -------------------------
+    // Phase 4 — NON‑BLOCKING (NEW)
+    // -------------------------
+    let security;
+    try {
+      const secRes = await axios.post(
+        `${SECURITY_ANALYZER_URL}/analyze`,
+        { openapi }
+      );
+      security = secRes.data;
+    } catch (e) {
+      console.warn("Security analyzer failed, continuing");
+      security = { issues: [] };
+    }
+
+    // -------------------------
     // Final response
     // -------------------------
     res.json({
       openapi,
       validation,
-      ambiguity
+      ambiguity,
+      security
     });
 
   } catch (err) {
-    // ONLY Phase 1 errors should land here
+    // ONLY Phase 1 errors land here
     console.error("Spec generation failed:", err.message);
     res.status(500).json({ error: "Spec generation failed" });
   }
