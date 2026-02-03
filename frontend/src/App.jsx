@@ -4,8 +4,16 @@ function App() {
   const [requirement, setRequirement] = useState("");
   const [spec, setSpec] = useState(null);
   const [validation, setValidation] = useState(null);
-  const [data, setData] = useState(null);
-
+  const [data, setData] = useState({
+    ambiguity: { ambiguities: [], clarification_questions: [] },
+    security: {
+      issues: [],
+      summary: {
+        total_rules_checked: 0,
+        issues_found: 0
+      }
+    }
+  });
 
   const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ?? "http://localhost:5000";
@@ -22,8 +30,14 @@ function App() {
 
     setSpec(responseData.openapi);
     setValidation(responseData.validation);
-    setData(responseData);
+
+    setData(prev => ({
+      ...prev,
+      ambiguity: responseData.ambiguity ?? prev.ambiguity,
+      security: responseData.security ?? prev.security
+    }));
   };
+
 
   return (
     <div style={{ padding: "20px" }}>
@@ -57,30 +71,51 @@ function App() {
       </div>
     )}
 
+    {/* ---------- Ambiguity Analyzer ---------- */}
     {data?.ambiguity && (
       <div style={{ marginTop: "20px" }}>
         <h3>⚠️ Ambiguities</h3>
-        <ul>
-          {data.ambiguity.ambiguities.map((a, i) => (
-            <li key={i}>{a}</li>
-          ))}
-        </ul>
+
+        {data.ambiguity.ambiguities?.length > 0 ? (
+          <ul>
+            {data.ambiguity.ambiguities.map((a, i) => (
+              <li key={i}>{a}</li>
+            ))}
+          </ul>
+        ) : (
+          <p style={{ color: "green" }}>✅ No ambiguities detected</p>
+        )}
 
         <h3>❓ Clarification Questions</h3>
-        <ul>
-          {data.ambiguity.clarification_questions.map((q, i) => (
-            <li key={i}>{q}</li>
-          ))}
-        </ul>
+
+        {data.ambiguity.clarification_questions?.length > 0 ? (
+          <ul>
+            {data.ambiguity.clarification_questions.map((q, i) => (
+              <li key={i}>{q}</li>
+            ))}
+          </ul>
+        ) : (
+          <p style={{ color: "gray" }}>No clarification questions needed</p>
+        )}
       </div>
     )}
 
+    {/* ---------- Security Analyzer ---------- */}
     {data?.security && (
       <div style={{ marginTop: "20px" }}>
         <h3>🔐 Security Risks</h3>
 
-        {data.security.issues.length === 0 ? (
-          <p style={{ color: "green" }}>✅ No security issues detected</p>
+        {data.security.summary && (
+          <p>
+            Checked {data.security.summary.total_rules_checked} rules ·{" "}
+            Found {data.security.summary.issues_found} issues
+          </p>
+        )}
+
+        {data.security.issues?.length === 0 ? (
+          <p style={{ color: "green" }}>
+            ✅ No security issues detected (basic checks passed)
+          </p>
         ) : (
           <ul>
             {data.security.issues.map((issue, i) => (

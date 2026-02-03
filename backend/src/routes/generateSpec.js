@@ -14,7 +14,9 @@ const AMBIGUITY_ANALYZER_URL =
 const SECURITY_ANALYZER_URL =
   process.env.SECURITY_ANALYZER_URL || "http://localhost:8003";
 
+
 router.post("/", async (req, res) => {
+  console.log("🔥 GENERATE-SPEC ROUTE WITH SECURITY HIT");
   try {
     const { requirement } = req.body;
     console.log("SPEC_GENERATOR_URL =", SPEC_GENERATOR_URL);
@@ -83,6 +85,8 @@ router.post("/", async (req, res) => {
     // -------------------------
     // Final response
     // -------------------------
+
+    console.log("FINAL RESPONSE:", { openapi, validation, ambiguity, security });
     res.json({
       openapi,
       validation,

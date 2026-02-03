@@ -36,20 +36,29 @@ class AmbiguityResponse(BaseModel):
 SYSTEM_PROMPT = """
 You are a senior backend architect.
 
-Analyze the API requirement and identify:
+Even if requirements seem clear, explicitly identify:
+- implicit assumptions
+- default choices that were not stated
+- decisions that would normally require confirmation
+
+Treat missing details as ambiguity.
+
+Analyze the API requirement and return:
 1. Ambiguities
-2. Missing or unclear requirements
+2. Clarification questions
 
 Focus on:
-- Authentication & authorization
-- Pagination & filtering
-- Error handling
+- Authentication & authorization (even if obvious)
+- Pagination & filtering defaults
+- Error response formats
 - Rate limits
-- Resource ownership
+- Ownership & permissions
 - Soft vs hard deletes
 - Sync vs async behavior
 
+If no ambiguity exists, explain what assumptions were made.
 Be concise and technical.
+
 """
 
 # -----------------------------
@@ -66,7 +75,7 @@ def analyze(req: AmbiguityRequest):
             model="gemini-2.5-flash",
             contents=SYSTEM_PROMPT + "\n\nRequirement:\n" + req.requirement,
             config={
-                "temperature": 0,
+                "temperature": 0.3,
                 "max_output_tokens": 1024,
                 "response_schema": {
                     "type": "object",

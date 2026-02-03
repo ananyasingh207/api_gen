@@ -13,8 +13,14 @@ class SecurityIssue(BaseModel):
     message: str
     location: str
 
+class SecuritySummary(BaseModel):
+    total_rules_checked: int
+    issues_found: int
+
 class SecurityResponse(BaseModel):
     issues: List[SecurityIssue]
+    summary: SecuritySummary
+
 
 @app.get("/health")
 def health():
@@ -26,7 +32,6 @@ def analyze_security(req: SecurityRequest):
     issues = []
 
     paths = spec.get("paths", {})
-    security_def = spec.get("components", {}).get("securitySchemes")
 
     # RULE 1 — No global security
     if not spec.get("security"):
@@ -58,4 +63,10 @@ def analyze_security(req: SecurityRequest):
                 location=f"{path}.delete"
             ))
 
-    return {"issues": issues}
+    return {
+        "issues": issues,
+        "summary": {
+            "total_rules_checked": 3,
+            "issues_found": len(issues)
+        }
+    }
