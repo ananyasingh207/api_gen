@@ -16,7 +16,6 @@ const SECURITY_ANALYZER_URL =
 
 
 router.post("/", async (req, res) => {
-  console.log("🔥 GENERATE-SPEC ROUTE WITH SECURITY HIT");
   try {
     const { requirement } = req.body;
     console.log("SPEC_GENERATOR_URL =", SPEC_GENERATOR_URL);
