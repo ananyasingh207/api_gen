@@ -62,3 +62,5 @@ coverage/
 # ===============================
 *.tmp
 *.swp
+
+ml-services/mock_server/node_modules/
