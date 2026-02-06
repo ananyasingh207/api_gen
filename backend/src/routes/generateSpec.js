@@ -90,7 +90,7 @@ router.post("/", async (req, res) => {
       openapi,
       validation,
       ambiguity,
-      security
+      security,
     });
 
   } catch (err) {
@@ -98,6 +98,7 @@ router.post("/", async (req, res) => {
     console.error("Spec generation failed:", err.message);
     res.status(500).json({ error: "Spec generation failed" });
   }
+
 });
 
 module.exports = router;
