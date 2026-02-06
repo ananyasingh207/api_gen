@@ -8,6 +8,14 @@ app.use(bodyParser.json());
 
 let prismProcess = null;
 
+const IS_PROD = !!process.env.RENDER_EXTERNAL_URL;
+const PORT = process.env.PORT || 3000;
+
+const PRISM_PORT = IS_PROD ? PORT : 4010;
+const MOCK_URL = IS_PROD
+  ? process.env.RENDER_EXTERNAL_URL
+  : `http://localhost:${PRISM_PORT}`;
+
 app.get("/health", (_, res) => {
   res.json({ status: "ok" });
 });
@@ -16,7 +24,7 @@ app.post("/start", (req, res) => {
   if (prismProcess) {
     return res.json({
       message: "Mock server already running",
-      mock_url: "http://localhost:4010"
+      mock_url: MOCK_URL
     });
   }
 
@@ -28,12 +36,12 @@ app.post("/start", (req, res) => {
   fs.writeFileSync("openapi.json", JSON.stringify(openapi, null, 2));
 
   prismProcess = exec(
-    "npx prism mock openapi.json --host 0.0.0.0 --port 4010"
+    `npx prism mock openapi.json --host 0.0.0.0 --port ${PRISM_PORT}`
   );
 
   res.json({
     message: "Mock server started",
-    mock_url: "http://localhost:4010"
+    mock_url: MOCK_URL
   });
 });
 
@@ -47,7 +55,6 @@ app.post("/stop", (_, res) => {
   res.json({ message: "Mock server was not running" });
 });
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Mock Server Controller running on port ${PORT}`);
 });
