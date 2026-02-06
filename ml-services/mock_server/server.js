@@ -1,9 +1,19 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const { exec } = require("child_process");
+const cors = require("cors");
 const fs = require("fs");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "*", 
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
 app.use(bodyParser.json());
 
 let prismProcess = null;
