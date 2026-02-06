@@ -16,7 +16,14 @@ const app = express();
 /* ------------------------- */
 /* Middleware */
 /* ------------------------- */
-app.use(cors());
+app.use(
+  cors({
+    origin: "*", // safe for mock server
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+  })
+);
+
 app.use(bodyParser.json());
 
 /* ------------------------- */
