@@ -3,6 +3,8 @@ const axios = require("axios");
 const router = express.Router();
 
 router.post("/start-mock", async (req, res) => {
+  console.log("MOCK_SERVER_URL =", process.env.MOCK_SERVER_URL);
+
   const { openapi } = req.body;
 
   const mockRes = await axios.post(

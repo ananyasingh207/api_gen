@@ -1,25 +1,15 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Authentication API",
+    "title": "Login API",
     "version": "1.0.0"
   },
-  "tags": [
-    {
-      "name": "Authentication",
-      "description": "User authentication operations"
-    }
-  ],
   "paths": {
     "/login": {
       "post": {
-        "tags": [
-          "Authentication"
-        ],
-        "summary": "User login",
-        "operationId": "loginUser",
+        "summary": "Authenticate user and issue a JWT token",
+        "description": "Allows a user to log in using their credentials (username/email and password) and receive an authentication token.",
         "requestBody": {
-          "description": "User credentials for login",
           "required": true,
           "content": {
             "application/json": {
@@ -41,30 +31,36 @@
             }
           },
           "400": {
-            "$ref": "#/components/responses/BadRequest"
-          },
-          "401": {
-            "description": "Invalid credentials",
+            "description": "Bad Request - Invalid input data",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
-                },
-                "examples": {
-                  "invalidCredentials": {
-                    "value": {
-                      "message": "Invalid username or password"
-                    }
-                  }
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - Invalid credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
           },
           "500": {
-            "$ref": "#/components/responses/InternalServerError"
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
           }
-        },
-        "security": []
+        }
       }
     }
   },
@@ -79,120 +75,52 @@
         "properties": {
           "username": {
             "type": "string",
-            "description": "User's unique identifier (e.g., email or username)",
+            "description": "User's unique username or email address.",
             "example": "user@example.com"
           },
           "password": {
             "type": "string",
             "format": "password",
-            "description": "User's password",
-            "example": "mysecretpassword"
+            "description": "User's password.",
+            "example": "mySecurePassword123"
           }
         }
       },
       "LoginResponse": {
         "type": "object",
         "required": [
-          "token"
+          "token",
+          "expiresIn"
         ],
         "properties": {
           "token": {
             "type": "string",
-            "description": "JWT authentication token",
+            "description": "JWT authentication token.",
             "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+          },
+          "expiresIn": {
+            "type": "integer",
+            "description": "Token expiration time in seconds.",
+            "example": 3600
           }
         }
       },
-      "Error": {
+      "ErrorResponse": {
         "type": "object",
         "required": [
+          "code",
           "message"
         ],
         "properties": {
+          "code": {
+            "type": "string",
+            "description": "A unique error code.",
+            "example": "INVALID_CREDENTIALS"
+          },
           "message": {
             "type": "string",
             "description": "A human-readable error message.",
-            "example": "An error occurred"
-          }
-        }
-      }
-    },
-    "responses": {
-      "BadRequest": {
-        "description": "Bad Request - Invalid input data",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "examples": {
-              "missingField": {
-                "value": {
-                  "message": "Missing required field: username"
-                }
-              },
-              "invalidFormat": {
-                "value": {
-                  "message": "Invalid format for field: password"
-                }
-              }
-            }
-          }
-        }
-      },
-      "Unauthorized": {
-        "description": "Unauthorized - Authentication required or invalid token",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "examples": {
-              "noToken": {
-                "value": {
-                  "message": "Authentication token is missing"
-                }
-              },
-              "invalidToken": {
-                "value": {
-                  "message": "Invalid authentication token"
-                }
-              }
-            }
-          }
-        }
-      },
-      "NotFound": {
-        "description": "Not Found - The requested resource could not be found",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "examples": {
-              "resourceNotFound": {
-                "value": {
-                  "message": "Resource not found"
-                }
-              }
-            }
-          }
-        }
-      },
-      "InternalServerError": {
-        "description": "Internal Server Error - Something went wrong on the server",
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "examples": {
-              "genericError": {
-                "value": {
-                  "message": "An unexpected error occurred"
-                }
-              }
-            }
+            "example": "Invalid username or password."
           }
         }
       }

@@ -13,6 +13,13 @@ app.get("/health", (_, res) => {
 });
 
 app.post("/start", (req, res) => {
+  if (prismProcess) {
+    return res.json({
+      message: "Mock server already running",
+      mock_url: "http://localhost:4010"
+    });
+  }
+
   const { openapi } = req.body;
   if (!openapi) {
     return res.status(400).json({ error: "OpenAPI spec required" });
@@ -32,10 +39,12 @@ app.post("/start", (req, res) => {
 
 app.post("/stop", (_, res) => {
   if (prismProcess) {
-    prismProcess.kill();
+    prismProcess.kill("SIGTERM");
     prismProcess = null;
+    return res.json({ message: "Mock server stopped" });
   }
-  res.json({ message: "Mock server stopped" });
+
+  res.json({ message: "Mock server was not running" });
 });
 
 const PORT = process.env.PORT || 3000;
