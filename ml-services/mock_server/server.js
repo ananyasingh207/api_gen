@@ -1,70 +1,121 @@
+/**
+ * Mock Server Controller
+ * - Local: starts/stops Prism mock server
+ * - Production (Render): mock execution disabled by design
+ */
+
 const express = require("express");
+const cors = require("cors");
 const bodyParser = require("body-parser");
 const { exec } = require("child_process");
-const cors = require("cors");
 const fs = require("fs");
+const path = require("path");
 
 const app = express();
 
-app.use(
-  cors({
-    origin: "*", 
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-  })
-);
-
+/* ------------------------- */
+/* Middleware */
+/* ------------------------- */
+app.use(cors());
 app.use(bodyParser.json());
 
-let prismProcess = null;
-
-const IS_PROD = !!process.env.RENDER_EXTERNAL_URL;
+/* ------------------------- */
+/* Environment */
+/* ------------------------- */
 const PORT = process.env.PORT || 3000;
+const IS_PROD =
+  process.env.NODE_ENV === "production" ||
+  Boolean(process.env.RENDER_EXTERNAL_URL);
 
-const PRISM_PORT = IS_PROD ? PORT : 4010;
-const MOCK_URL = IS_PROD
-  ? process.env.RENDER_EXTERNAL_URL
-  : `http://localhost:${PRISM_PORT}`;
+/* ------------------------- */
+/* Local-only state */
+/* ------------------------- */
+let prismProcess = null;
+const LOCAL_PRISM_PORT = 4010;
+const LOCAL_MOCK_URL = `http://localhost:${LOCAL_PRISM_PORT}`;
 
+/* ------------------------- */
+/* Health check (Render) */
+/* ------------------------- */
 app.get("/health", (_, res) => {
-  res.json({ status: "ok" });
+  res.json({
+    status: "ok",
+    environment: IS_PROD ? "production" : "local"
+  });
 });
 
+/* ------------------------- */
+/* Start mock server */
+/* ------------------------- */
 app.post("/start", (req, res) => {
+  /* 🚫 Production guard */
+  if (IS_PROD) {
+    return res.status(403).json({
+      message:
+        "Mock API execution is disabled in production. Use local environment."
+    });
+  }
+
+  /* Already running */
   if (prismProcess) {
     return res.json({
       message: "Mock server already running",
-      mock_url: MOCK_URL
+      mock_url: LOCAL_MOCK_URL
     });
   }
 
   const { openapi } = req.body;
   if (!openapi) {
-    return res.status(400).json({ error: "OpenAPI spec required" });
+    return res.status(400).json({
+      error: "OpenAPI spec is required to start mock server"
+    });
   }
 
-  fs.writeFileSync("openapi.json", JSON.stringify(openapi, null, 2));
+  /* Write OpenAPI spec */
+  const specPath = path.join(__dirname, "openapi.json");
+  fs.writeFileSync(specPath, JSON.stringify(openapi, null, 2));
 
+  /* Start Prism */
   prismProcess = exec(
-    `npx prism mock openapi.json --host 0.0.0.0 --port ${PRISM_PORT}`
+    `npx prism mock "${specPath}" --host 0.0.0.0 --port ${LOCAL_PRISM_PORT}`,
+    { stdio: "ignore" }
   );
+
+  prismProcess.on("exit", () => {
+    prismProcess = null;
+  });
 
   res.json({
     message: "Mock server started",
-    mock_url: MOCK_URL
+    mock_url: LOCAL_MOCK_URL
   });
 });
 
+/* ------------------------- */
+/* Stop mock server */
+/* ------------------------- */
 app.post("/stop", (_, res) => {
-  if (prismProcess) {
-    prismProcess.kill("SIGTERM");
-    prismProcess = null;
-    return res.json({ message: "Mock server stopped" });
+  if (!prismProcess) {
+    return res.json({
+      message: "Mock server is not running"
+    });
   }
 
-  res.json({ message: "Mock server was not running" });
+  prismProcess.kill("SIGTERM");
+  prismProcess = null;
+
+  res.json({
+    message: "Mock server stopped"
+  });
 });
 
+/* ------------------------- */
+/* Start server */
+/* ------------------------- */
 app.listen(PORT, () => {
-  console.log(`Mock Server Controller running on port ${PORT}`);
+  console.log(
+    `Mock Server Controller running on port ${PORT} [${
+      IS_PROD ? "PROD" : "LOCAL"
+    }]`
+  );
 });
