@@ -1,128 +1,110 @@
-/**
- * Mock Server Controller
- * - Local: starts/stops Prism mock server
- * - Production (Render): mock execution disabled by design
- */
-
 const express = require("express");
 const cors = require("cors");
-const bodyParser = require("body-parser");
-const { exec } = require("child_process");
-const fs = require("fs");
-const path = require("path");
 
 const app = express();
 
-/* ------------------------- */
-/* Middleware */
-/* ------------------------- */
 app.use(
   cors({
-    origin: "*", // safe for mock server
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+    origin: "*",
+    methods: ["GET", "POST", "DELETE", "PUT", "PATCH"],
+    allowedHeaders: ["Content-Type"]
   })
 );
 
-app.use(bodyParser.json());
+app.use(express.json());
 
-/* ------------------------- */
-/* Environment */
-/* ------------------------- */
 const PORT = process.env.PORT || 3000;
-const IS_PROD =
-  process.env.NODE_ENV === "production" ||
-  Boolean(process.env.RENDER_EXTERNAL_URL);
+
+let currentSpec = null;
 
 /* ------------------------- */
-/* Local-only state */
-/* ------------------------- */
-let prismProcess = null;
-const LOCAL_PRISM_PORT = 4010;
-const LOCAL_MOCK_URL = `http://localhost:${LOCAL_PRISM_PORT}`;
-
-/* ------------------------- */
-/* Health check (Render) */
+/* Health */
 /* ------------------------- */
 app.get("/health", (_, res) => {
-  res.json({
-    status: "ok",
-    environment: IS_PROD ? "production" : "local"
-  });
+  res.json({ status: "ok" });
 });
 
 /* ------------------------- */
-/* Start mock server */
+/* Start Mock */
 /* ------------------------- */
-app.post("/start", (req, res) => {
-  /* 🚫 Production guard */
-  if (IS_PROD) {
-    return res.status(403).json({
-      message:
-        "Mock API execution is disabled in production. Use local environment."
-    });
-  }
-
-  /* Already running */
-  if (prismProcess) {
-    return res.json({
-      message: "Mock server already running",
-      mock_url: LOCAL_MOCK_URL
-    });
-  }
-
+app.post("/start-mock", (req, res) => {
   const { openapi } = req.body;
+
   if (!openapi) {
     return res.status(400).json({
-      error: "OpenAPI spec is required to start mock server"
+      error: "OpenAPI spec required"
     });
   }
 
-  /* Write OpenAPI spec */
-  const specPath = path.join(__dirname, "openapi.json");
-  fs.writeFileSync(specPath, JSON.stringify(openapi, null, 2));
-
-  /* Start Prism */
-  prismProcess = exec(
-    `npx prism mock "${specPath}" --host 0.0.0.0 --port ${LOCAL_PRISM_PORT}`,
-    { stdio: "ignore" }
-  );
-
-  prismProcess.on("exit", () => {
-    prismProcess = null;
-  });
+  currentSpec = openapi;
 
   res.json({
-    message: "Mock server started",
-    mock_url: LOCAL_MOCK_URL
+    message: "Mock routes registered successfully",
+    mock_url: process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`
   });
 });
 
 /* ------------------------- */
-/* Stop mock server */
+/* Stop Mock */
 /* ------------------------- */
-app.post("/stop", (_, res) => {
-  if (!prismProcess) {
-    return res.json({
-      message: "Mock server is not running"
-    });
-  }
-
-  prismProcess.kill("SIGTERM");
-  prismProcess = null;
+app.post("/stop-mock", (_, res) => {
+  currentSpec = null;
 
   res.json({
-    message: "Mock server stopped"
+    message: "Mock routes cleared"
   });
 });
 
 /* ------------------------- */
-/* Start server */
+/* Dynamic Mock Handler */
+/* ------------------------- */
+app.use((req, res, next) => {
+  if (!currentSpec) return next();
+
+  const method = req.method.toLowerCase();
+  const requestPath = req.path;
+
+  const paths = currentSpec.paths || {};
+
+  for (const specPath in paths) {
+    // Convert OpenAPI path to regex
+    const regexPath = specPath.replace(/{[^}]+}/g, "[^/]+");
+    const regex = new RegExp(`^${regexPath}$`);
+
+    if (regex.test(requestPath) && paths[specPath][method]) {
+      const operation = paths[specPath][method];
+      const responses = operation.responses || {};
+      const firstKey = Object.keys(responses)[0];
+      const firstResponse = responses[firstKey];
+
+      const example =
+        firstResponse?.content?.["application/json"]?.example ||
+        firstResponse?.content?.["application/json"]?.examples?.default?.value;
+
+      return res.json(
+        example || {
+          message: `Mock response for ${method.toUpperCase()} ${requestPath}`
+        }
+      );
+    }
+  }
+
+  next();
+});
+
+/* ------------------------- */
+/* Fallback */
+/* ------------------------- */
+app.use((req, res) => {
+  res.status(404).json({
+    error: "Route not found in mock spec"
+  });
+});
+
+/* ------------------------- */
+/* Start Server */
 /* ------------------------- */
 app.listen(PORT, () => {
-  console.log(
-    `Mock Server Controller running on port ${PORT} [${
-      IS_PROD ? "PROD" : "LOCAL"
-    }]`
-  );
+  console.log(`Mock Server running on port ${PORT}`);
 });
+

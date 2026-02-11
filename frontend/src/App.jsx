@@ -21,6 +21,10 @@ function App() {
   const [mock, setMock] = useState(null);
   const [loadingMock, setLoadingMock] = useState(false);
 
+
+  const MOCK_URL =
+    import.meta.env.VITE_MOCK_URL ?? "http://localhost:3000";
+
   const BACKEND_URL =
     import.meta.env.VITE_BACKEND_URL ?? "http://localhost:5000";
 
@@ -71,13 +75,16 @@ function App() {
     }
   };
 
+
   // -------------------------
   // Phase 5: Stop Mock Server
   // -------------------------
   const stopMockServer = async () => {
     try {
       setLoadingMock(true);
-      await fetch(`${BACKEND_URL}/stop-mock`, { method: "POST" });
+      await fetch(`${BACKEND_URL}/stop-mock`, {
+        method: "POST"
+      });
       setMock(null);
     } catch (err) {
       console.error("Failed to stop mock server", err);
@@ -88,7 +95,7 @@ function App() {
 
   return (
     <div style={{ padding: "20px" }}>
-      <h2>AI API Architect</h2>
+      <h2>AI API Gen</h2>
 
       <textarea
         rows="6"

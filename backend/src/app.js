@@ -7,14 +7,24 @@ const mockRouter = require("./routes/mockRoute");
 const app = express();
 
 app.use(cors({
-    origin: [
-      "https://api-gen-nu.vercel.app", // Vercel frontend
-      "http://localhost:5173"          // local dev (Vite)
-    ],
-    methods: ["GET", "POST", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"]
+  origin: [
+    "https://api-gen-nu.vercel.app",
+    "http://localhost:5173"
+  ],
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
 }));
 
+app.use(
+  cors({
+    origin: [
+      "https://api-gen-nu.vercel.app",
+      "http://localhost:5173"
+    ],
+    credentials: true
+  })
+);
 
 app.use(express.json());
 
