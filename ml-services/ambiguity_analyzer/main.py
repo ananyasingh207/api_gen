@@ -3,6 +3,8 @@ import certifi
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google import genai
+from google.genai import types
+import json
 
 # -----------------------------
 # SSL FIX (Windows / Render safe)
@@ -34,31 +36,39 @@ class AmbiguityResponse(BaseModel):
 # Prompt
 # -----------------------------
 SYSTEM_PROMPT = """
-You are a senior backend architect.
+You are a strict backend architecture reviewer.
 
-Even if requirements seem clear, explicitly identify:
-- implicit assumptions
-- default choices that were not stated
-- decisions that would normally require confirmation
+You MUST always identify ambiguities, even if the requirement appears simple.
 
-Treat missing details as ambiguity.
+Treat ANY missing detail as ambiguity.
 
-Analyze the API requirement and return:
-1. Ambiguities
-2. Clarification questions
+Do NOT assume defaults.
+Do NOT fill gaps silently.
+If something is not explicitly stated, it is ambiguous.
 
-Focus on:
-- Authentication & authorization (even if obvious)
-- Pagination & filtering defaults
-- Error response formats
-- Rate limits
-- Ownership & permissions
-- Soft vs hard deletes
-- Sync vs async behavior
+For the given API requirement:
 
-If no ambiguity exists, explain what assumptions were made.
-Be concise and technical.
+1. List ALL ambiguities (minimum 3 if possible)
+2. List clarification questions (minimum 3 if possible)
 
+Focus especially on:
+- Authentication & authorization
+- Roles & permissions
+- Pagination defaults
+- Filtering behavior
+- Sorting
+- Rate limiting
+- Error response structure
+- Ownership rules
+- Soft vs hard delete
+- Async vs sync operations
+- Data validation rules
+
+Return ONLY valid JSON:
+{
+  "ambiguities": [...],
+  "clarification_questions": [...]
+}
 """
 
 # -----------------------------
@@ -68,46 +78,41 @@ Be concise and technical.
 def health():
     return {"status": "ok"}
 
+import re
+
 @app.post("/analyze", response_model=AmbiguityResponse)
 def analyze(req: AmbiguityRequest):
     try:
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=SYSTEM_PROMPT + "\n\nRequirement:\n" + req.requirement,
-            config={
-                "temperature": 0.3,
-                "max_output_tokens": 1024,
-                "response_schema": {
-                    "type": "object",
-                    "properties": {
-                        "ambiguities": {
-                            "type": "array",
-                            "items": { "type": "string" }
-                        },
-                        "clarification_questions": {
-                            "type": "array",
-                            "items": { "type": "string" }
-                        }
-                    },
-                    "required": ["ambiguities", "clarification_questions"]
-                }
-            }
+            config=types.GenerateContentConfig(
+                temperature=0.5,
+                max_output_tokens=4096,
+                response_mime_type="application/json"
+            )
         )
 
-        # 🔒 DEFENSIVE CHECK (THIS FIXES YOUR ERROR)
-        if response.parsed is None:
-            return {
-                "ambiguities": [],
-                "clarification_questions": [
-                    "The requirement may already be sufficiently clear, or more context is needed."
-                ]
-            }
+        raw_text = response.text.strip()
+        print("RAW RESPONSE:\n", raw_text)
 
-        data = response.parsed
+        # Extract JSON block safely
+        json_match = re.search(r"\{.*\}", raw_text, re.DOTALL)
+
+        if not json_match:
+            raise ValueError("No JSON object found in model output")
+
+        json_str = json_match.group(0)
+
+        try:
+            data = json.loads(json_str)
+        except Exception as e:
+            print("JSON PARSE ERROR:", e)
+            raise ValueError("Model returned malformed JSON")
 
         return {
-            "ambiguities": data["ambiguities"],
-            "clarification_questions": data["clarification_questions"]
+            "ambiguities": data.get("ambiguities", []),
+            "clarification_questions": data.get("clarification_questions", [])
         }
 
     except Exception as e:
@@ -115,4 +120,3 @@ def analyze(req: AmbiguityRequest):
             status_code=500,
             detail=f"Ambiguity analysis failed: {str(e)}"
         )
-

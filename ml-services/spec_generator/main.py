@@ -1,9 +1,10 @@
 import os
 import certifi
-import yaml
+import json
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from google import genai
+from google.genai import types
 import traceback
 
 # -----------------------------
@@ -48,7 +49,7 @@ STRICT RULES:
 - Use JWT Bearer authentication unless explicitly stated otherwise
 - Do NOT include explanations
 - Do NOT include markdown
-- Output ONLY valid OpenAPI YAML
+- Output ONLY valid OpenAPI JSON
 """
 
 # -----------------------------
@@ -66,14 +67,19 @@ def generate_spec(req: SpecRequest):
         response = client.models.generate_content(
             model="gemini-2.5-flash",
             contents=prompt,
-            config={
-                "temperature": 0,
-                "max_output_tokens": 4096
-            }
+            config=types.GenerateContentConfig(
+                temperature=0,
+                max_output_tokens=4096,
+                response_mime_type="application/json"
+            )
         )
 
-        yaml_text = response.text.strip()
-        spec_dict = yaml.safe_load(yaml_text)
+        try:
+            spec_dict = response.parsed or json.loads(response.text)
+        except Exception:
+            print("RAW OUTPUT:\n", response.text)
+            raise ValueError("Model did not return valid JSON")
+
 
         if not isinstance(spec_dict, dict):
             raise ValueError("Invalid OpenAPI output")

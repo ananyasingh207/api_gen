@@ -99,7 +99,8 @@ function App() {
         stopMockServer={stopMockServer}
       />
 
-      <SpecViewer spec={spec} />
+      <SpecViewer spec={spec} setSpec={setSpec} />
+
 
       <SwaggerPreview
         spec={spec}
