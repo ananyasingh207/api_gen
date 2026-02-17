@@ -23,8 +23,8 @@ API Gen follows a **Microservices Architecture** to ensure modularity, scalabili
 
 ```mermaid
 graph TD
-    User[User] -->|Interacts| Client[Frontend (React)]
-    Client -->|HTTP Requests| Gateway[Backend Gateway (Node.js/Express)]
+    User[User] -->|Interacts| Client["Frontend (React)"]
+    Client -->|HTTP Requests| Gateway["Backend Gateway (Node.js/Express)"]
     
     subgraph "ML Services (Python/FastAPI)"
         Gateway -->|POST /generate| SpecGen[Spec Generator]
@@ -34,7 +34,7 @@ graph TD
     end
     
     subgraph "Tooling"
-        Gateway -->|Control| MockServer[Mock Server (Node.js)]
+        Gateway -->|Control| MockServer["Mock Server (Node.js)"]
         MockServer -->|Serves| MockAPI[Mock API Endpoints]
     end
 ```
@@ -210,6 +210,8 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📄 License
+## Vision
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+API Gen is designed to be **production-oriented, modular, and extensible**, making it suitable for real-world API development and enterprise-scale workflows.
+
+The long-term goal is to evolve API Gen into a full AI-assisted API design, validation, and delivery platform.
