@@ -1,12 +1,7 @@
 import { useState } from "react";
 
-import RequirementInput from "./components/RequirementInput";
-import MockControls from "./components/MockControls";
-import SpecViewer from "./components/SpecViewer";
-import SwaggerPreview from "./components/SwaggerPreview";
-import ValidationResult from "./components/ValidationResult";
-import AmbiguityPanel from "./components/AmbiguityPanel";
-import SecurityPanel from "./components/SecurityPanel";
+import SpecInputPage from "./pages/SpecInputPage";
+import WorkspacePage from "./pages/WorkspacePage";
 
 import {
   generateSpecAPI,
@@ -82,37 +77,26 @@ function App() {
   };
 
   return (
-    <div style={{ padding: "20px" }}>
-      <h2>AI API Gen</h2>
-
-      <RequirementInput
-        requirement={requirement}
-        setRequirement={setRequirement}
-        generateSpec={generateSpec}
-      />
-
-      <MockControls
-        spec={spec}
-        mock={mock}
-        loadingMock={loadingMock}
-        startMockServer={startMockServer}
-        stopMockServer={stopMockServer}
-      />
-
-      <SpecViewer spec={spec} setSpec={setSpec} />
-
-
-      <SwaggerPreview
-        spec={spec}
-        mock={mock}
-      />
-
-      <ValidationResult validation={validation} />
-
-      <AmbiguityPanel data={data} />
-
-      <SecurityPanel data={data} />
-    </div>
+    <>
+      {!spec ? (
+        <SpecInputPage
+          requirement={requirement}
+          setRequirement={setRequirement}
+          generateSpec={generateSpec}
+        />
+      ) : (
+        <WorkspacePage
+          spec={spec}
+          setSpec={setSpec}
+          validation={validation}
+          data={data}
+          mock={mock}
+          loadingMock={loadingMock}
+          startMockServer={startMockServer}
+          stopMockServer={stopMockServer}
+        />
+      )}
+    </>
   );
 }
 
