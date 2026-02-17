@@ -6,7 +6,7 @@ function SwaggerPreview({ spec, mock }) {
 
   return (
     <div style={{ marginTop: "30px" }}>
-      <h3>📘 Swagger API Preview</h3>
+      <h3>Swagger API Preview</h3>
       <SwaggerUI
         spec={{
           ...spec,

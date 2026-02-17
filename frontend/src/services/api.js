@@ -1,7 +1,7 @@
 const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL ?? "http://localhost:5000";
 
-export const generateSpecAPI = async (requirement) => {
+  export const generateSpecAPI = async (requirement) => {
   const res = await fetch(`${BACKEND_URL}/generate-spec`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },

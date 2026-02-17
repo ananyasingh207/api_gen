@@ -1,11 +1,11 @@
 function SecurityPanel({ data }) {
   return (
     <div style={{ marginTop: "20px" }}>
-      <h3>🔐 Security Risks</h3>
+      <h3>Security Risks</h3>
 
       {data.security.issues.length === 0 ? (
         <p style={{ color: "green" }}>
-          ✅ No security issues detected
+          No security issues detected
         </p>
       ) : (
         <ul>

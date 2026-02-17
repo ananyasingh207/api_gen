@@ -94,6 +94,9 @@ function App() {
           loadingMock={loadingMock}
           startMockServer={startMockServer}
           stopMockServer={stopMockServer}
+          requirement={requirement}
+          setRequirement={setRequirement}
+          generateSpec={generateSpec}
         />
       )}
     </>

@@ -1,0 +1,184 @@
+.workspace-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    box-sizing: border-box;
+    padding-bottom: 32px;
+}
+
+.workspace-generate {
+    padding: 12px 20px;
+    background: #0B1220;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.generate-row {
+    display: flex;
+    align-items: stretch;
+    gap: 12px;
+}
+
+.generate-row textarea {
+    flex: 1;
+}
+
+/* Specific overrides for the input component when in this row */
+.generate-row .input-textarea {
+    min-height: 64px;
+    max-height: 120px;
+}
+
+.generate-row .generate-button {
+    align-self: auto;
+    /* Override align-self: flex-end from SpecInputPage.css */
+    margin-top: 0;
+    padding: 0 24px;
+    /* Reduce vertical padding, let height stretching handle it */
+}
+
+.workspace-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background: #0B1220;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.workspace-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.workspace-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #E5E7EB;
+    margin-right: 8px;
+}
+
+.header-action-btn {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.header-action-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.3);
+    color: #ffffff;
+}
+
+.header-action-btn:active {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.workspace-header-right {
+    display: flex;
+    gap: 8px;
+}
+
+.tab-btn {
+    height: 32px;
+    padding: 0 14px;
+    border-radius: 6px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.tab-btn.active {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+.workspace-body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    /* Prevent body scroll, let panels scroll */
+}
+
+.workspace-left {
+    flex: 0 0 65%;
+    overflow: auto;
+    min-height: 0;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.workspace-right {
+    flex: 0 0 35%;
+    overflow: auto;
+    min-height: 0;
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Mock Server Buttons */
+.mock-btn {
+    height: 38px;
+    width: 100%;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: all 150ms ease;
+    box-sizing: border-box;
+}
+
+.mock-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+.mock-btn-primary {
+    background: #2563eb;
+    color: white;
+    border: 1px solid #2563eb;
+}
+
+.mock-btn-primary:hover:not(:disabled) {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+}
+
+.mock-btn-danger {
+    background: rgba(239, 68, 68, 0.1);
+    color: #ef4444;
+    border: 1px solid rgba(239, 68, 68, 0.4);
+}
+
+.mock-btn-danger:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.18);
+}

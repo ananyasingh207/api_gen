@@ -47,10 +47,8 @@ function SpecViewer({ spec, setSpec }) {
   if (!spec) return null;
 
   return (
-    <div style={{ height: "500px", marginTop: "20px" }}>
-      <h3>📝 OpenAPI Spec Editor</h3>
+    <div style={{ marginTop: "10px", height: "100%" }}>
       <Editor
-        height="100%"
         defaultLanguage="json"
         theme="vs-dark"
         value={editorValue}
@@ -61,8 +59,11 @@ function SpecViewer({ spec, setSpec }) {
           fontSize: 14,
           formatOnPaste: true,
           formatOnType: true,
-          wordWrap: "on"
+          wordWrap: "on",
+          automaticLayout: true,
+          scrollBeyondLastLine: false
         }}
+        height="100%"
       />
     </div>
   );
