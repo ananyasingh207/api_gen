@@ -2,7 +2,7 @@ function ValidationResult({ validation }) {
   return (
     <div style={{ marginTop: "10px" }}>
       <div style={{ fontWeight: 500, marginBottom: "6px" }}>
-        OpenAPI Validation
+        <h3>OpenAPI Validation</h3>
       </div>
 
       {!validation ? (
