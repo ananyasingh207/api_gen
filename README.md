@@ -22,18 +22,20 @@
 API Gen follows a **Microservices Architecture** to ensure modularity, scalability, and separation of concerns.
 
 ```mermaid
-graph TD
+flowchart TD
     User[User] -->|Interacts| Client["Frontend (React)"]
     Client -->|HTTP Requests| Gateway["Backend Gateway (Node.js/Express)"]
     
-    subgraph "ML Services (Python/FastAPI)"
+    subgraph ML_Services ["ML Services (Python/FastAPI)"]
+        direction TB
         Gateway -->|POST /generate| SpecGen[Spec Generator]
         Gateway -->|POST /validate| Validator[OpenAPI Validator]
         Gateway -->|POST /analyze| Ambiguity[Ambiguity Analyzer]
         Gateway -->|POST /security| Security[Security Analyzer]
     end
     
-    subgraph "Tooling"
+    subgraph Tooling ["Tooling"]
+        direction TB
         Gateway -->|Control| MockServer["Mock Server (Node.js)"]
         MockServer -->|Serves| MockAPI[Mock API Endpoints]
     end
