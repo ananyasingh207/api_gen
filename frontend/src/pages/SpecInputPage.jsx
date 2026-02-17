@@ -19,16 +19,6 @@ const SpecInputPage = ({ requirement, setRequirement, generateSpec }) => {
                     <p className="hero-subtitle">Describe your requirements and we'll generate the full specification.</p>
                 </div>
 
-                {/* Prompt Input Container happens inside RequirementInput, 
-                    but we pass a wrapper class or restructure RequirementInput to fit.
-                    Actually, RequirementInput returns textarea and button. 
-                    We should wrap it in .input-container here or inside the component.
-                    Let's update RequirementInput to have the container class 
-                    or wrap it here if it's just fragments.
-                    
-                    Looking at RequirementInput, it returns fragments. 
-                    So we can wrap it here.
-                */}
                 <div className="input-container">
                     <RequirementInput
                         requirement={requirement}
