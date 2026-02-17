@@ -29,19 +29,35 @@ function App() {
   const [loadingMock, setLoadingMock] = useState(false);
 
   // -------------------------
+  // Generate Spec State
+  // -------------------------
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [generateError, setGenerateError] = useState(null);
+
+  // -------------------------
   // Generate Spec
   // -------------------------
   const generateSpec = async () => {
-    const responseData = await generateSpecAPI(requirement);
+    try {
+      setGenerateError(null);
+      setIsGenerating(true);
 
-    setSpec(responseData.openapi);
-    setValidation(responseData.validation);
+      const responseData = await generateSpecAPI(requirement);
 
-    setData(prev => ({
-      ...prev,
-      ambiguity: responseData.ambiguity ?? prev.ambiguity,
-      security: responseData.security ?? prev.security
-    }));
+      setSpec(responseData.openapi);
+      setValidation(responseData.validation);
+
+      setData(prev => ({
+        ...prev,
+        ambiguity: responseData.ambiguity ?? prev.ambiguity,
+        security: responseData.security ?? prev.security
+      }));
+    } catch (error) {
+      console.error("Generate API failed:", error);
+      setGenerateError("Unable to reach the server. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   // -------------------------
@@ -83,6 +99,8 @@ function App() {
           requirement={requirement}
           setRequirement={setRequirement}
           generateSpec={generateSpec}
+          isGenerating={isGenerating}
+          generateError={generateError}
         />
       ) : (
         <WorkspacePage
@@ -97,6 +115,8 @@ function App() {
           requirement={requirement}
           setRequirement={setRequirement}
           generateSpec={generateSpec}
+          isGenerating={isGenerating}
+          generateError={generateError}
         />
       )}
     </>

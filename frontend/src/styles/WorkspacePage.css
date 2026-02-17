@@ -182,3 +182,65 @@
 .mock-btn-danger:hover:not(:disabled) {
     background: rgba(239, 68, 68, 0.18);
 }
+
+/* Spinner */
+.spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.4);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    margin-right: 6px;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Error Message */
+.generate-error {
+    margin-top: 12px;
+    padding: 10px 14px;
+    border-radius: 6px;
+    background: rgba(239, 68, 68, 0.08);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #f87171;
+    font-size: 14px;
+}
+
+/* Swagger Light Theme Isolation */
+.swagger-light-scope {
+    background: transparent;
+}
+
+.swagger-light-scope .swagger-ui {
+    background: #ffffff;
+    color: #1f2937;
+    border-radius: 6px;
+    padding: 16px;
+}
+
+.swagger-light-scope .swagger-ui .topbar {
+    display: none;
+    /* optional */
+}
+
+.swagger-light-scope .swagger-ui .info {
+    background: #ffffff;
+}
+
+.swagger-light-scope .swagger-ui .scheme-container {
+    background: #f8fafc;
+    box-shadow: none;
+}
+
+.swagger-light-scope .swagger-ui .opblock {
+    background: #ffffff;
+}
+
+.swagger-light-scope .swagger-ui .opblock-summary {
+    background: #f8fafc;
+}

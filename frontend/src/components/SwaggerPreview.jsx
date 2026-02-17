@@ -7,14 +7,16 @@ function SwaggerPreview({ spec, mock }) {
   return (
     <div style={{ marginTop: "30px" }}>
       <h3>Swagger API Preview</h3>
-      <SwaggerUI
-        spec={{
-          ...spec,
-          servers: mock?.mock_url
-            ? [{ url: mock.mock_url, description: "Mock Server" }]
-            : spec.servers
-        }}
-      />
+      <div className="swagger-light-scope">
+        <SwaggerUI
+          spec={{
+            ...spec,
+            servers: mock?.mock_url
+              ? [{ url: mock.mock_url, description: "Mock Server" }]
+              : spec.servers
+          }}
+        />
+      </div>
     </div>
   );
 }

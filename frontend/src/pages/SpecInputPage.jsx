@@ -1,7 +1,7 @@
 import RequirementInput from "../components/RequirementInput";
 import "../styles/SpecInputPage.css";
 
-const SpecInputPage = ({ requirement, setRequirement, generateSpec }) => {
+const SpecInputPage = ({ requirement, setRequirement, generateSpec, isGenerating, generateError }) => {
     return (
         <div className="spec-input-page">
             {/* Header Area */}
@@ -24,6 +24,8 @@ const SpecInputPage = ({ requirement, setRequirement, generateSpec }) => {
                         requirement={requirement}
                         setRequirement={setRequirement}
                         generateSpec={generateSpec}
+                        isGenerating={isGenerating}
+                        generateError={generateError}
                     />
                 </div>
 

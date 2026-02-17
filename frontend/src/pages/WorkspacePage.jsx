@@ -21,6 +21,8 @@ const WorkspacePage = ({
     requirement,
     setRequirement,
     generateSpec,
+    isGenerating,
+    generateError
 }) => {
     const [activeTab, setActiveTab] = useState("editor");
 
@@ -81,6 +83,8 @@ const WorkspacePage = ({
                         requirement={requirement}
                         setRequirement={setRequirement}
                         generateSpec={generateSpec}
+                        isGenerating={isGenerating}
+                        generateError={generateError}
                     />
                 </div>
             </div>
