@@ -114,6 +114,10 @@ npm start
 cd ../frontend
 npm install
 ```
+Create a `.env` file in the `frontend` directory:
+```env
+VITE_BACKEND_URL=http://localhost:5000
+```
 Start the frontend development server:
 ```bash
 npm run dev
