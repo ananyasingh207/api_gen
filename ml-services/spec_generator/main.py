@@ -42,11 +42,33 @@ Convert the given natural language API requirement into a VALID OpenAPI 3.0.3 sp
 
 STRICT RULES:
 - REST APIs only
-- JSON request and response bodies
+- Use versioned endpoints (prefix all paths with /v1)
+- Use resource-oriented naming (e.g., /users/{id}, /orders/{id})
+- Use plural nouns for resources (e.g., /users, /products, /orders)
+- JSON request and response bodies only
 - Define schemas under components.schemas
 - Include request validation
-- Include standard HTTP error responses (400, 401, 404, 500)
 - Use JWT Bearer authentication unless explicitly stated otherwise
+
+RESPONSE ENVELOPE (ALL endpoints must follow this):
+{
+  "success": true,
+  "data": <response_payload_or_null>,
+  "error": <error_object_or_null>
+}
+
+LIST ENDPOINT RULES:
+- All collection GET endpoints must support pagination, filtering, and sorting
+- Include query params: limit, offset, sort
+
+ERROR CONTRACT (ALL endpoints must include these responses):
+- 400: Validation error
+- 401: Unauthorized
+- 403: Forbidden
+- 404: Not Found
+- 500: Internal Server Error
+
+OUTPUT RULES:
 - Do NOT include explanations
 - Do NOT include markdown
 - Output ONLY valid OpenAPI JSON
